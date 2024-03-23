@@ -1,0 +1,24 @@
+{ graphics: lg,
+  keyboard: lk,
+  mouse: lm,
+  audio: la,
+  event: le,
+  timer: lt,
+  window: lw } = love
+
+import "lib.lume" as L
+
+export class Game
+  new: =>
+     @iTime = 0
+     @iResolution, _ = lw.getMode! -- Discard table, keep resolution
+     @bg = lg.newImage "assets/sprites/background.jpg"
+
+  update: (dt)=>
+    @iTime += dt
+
+  draw: (dt, iTime)=>
+    lg.draw(@bg, 0, 0)
+    lg.print("mouse_x: " .. lm.getX! .. " - mouse_y: " .. lm.getY!, 5, 5)
+    lg.print("Current FPS: " .. tostring(lt.getFPS!), 5, 45)
+    lg.print("Time Elapsed: " .. L.round(@iTime, 0.001), 5, 85)
