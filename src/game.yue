@@ -1,24 +1,63 @@
-{ graphics: lg,
-  keyboard: lk,
-  mouse: lm,
-  audio: la,
-  event: le,
-  timer: lt,
-  window: lw } = love
+{ graphics: lg, keyboard: lk, mouse: lm, audio: la, event: le, timer: lt, window: lw } = love
 
 import "lib.lume" as L
 
 export class Game
   new: =>
-     @iTime = 0
-     @iResolution, _ = lw.getMode! -- Discard table, keep resolution
-     @bg = lg.newImage "assets/sprites/background.jpg"
+    @iTime = 0
+    @screen_width, @screen_height = lw.getMode! -- Discard table, keep resolution
+    @gridSize = 5 -- size of each grid square in pixels
+    @gridRows, @gridCols = @screen_height/@gridSize, @screen_width/@gridSize
+    @grid = @createGrid(@gridCols, @gridRows)   -- table which will hold our stars
+    @next_grid = {}
+    @dragging = false
+
+  createGrid: (cols, rows)=>
+    grid = {}
+    for x=1, cols
+      grid[x] = {}
+      for y=1, rows
+        grid[x][y] = 0
+    return grid
+
+  columnInBounds: (x)=>
+    return x >= 1 and x <= @gridCols
+
+  rowInBounds: (y)=>
+    return y >= 1 and y <= @gridRows
+
+  add_sand: =>
+    x, y = L.round(lm.getX!/@gridSize), L.round(lm.getY!/@gridSize)
+    @grid[x][y] = 1 if @rowInBounds(y) and @columnInBounds(x)
+
+  update_sand: =>
+    for x=1, @gridCols
+      for y=1, @gridRows
+        if @grid[x][y] == 1
+          @next_grid[x][y] = 0 -- remove sand from current cell
+          if @rowInBounds(y+1) and @grid[x][y+1] == 0
+            @next_grid[x][y+1] = 1
+          elseif @rowInBounds(y+1) and @columnInBounds(x-1) and @grid[x-1][y+1] == 0
+            @next_grid[x-1][y+1] = 1
+          elseif @rowInBounds(y+1) and @columnInBounds(x+1) and @grid[x+1][y+1] == 0
+            @next_grid[x+1][y+1] = 1
+          else
+            @next_grid[x][y] = 1
+    @grid = @next_grid
 
   update: (dt)=>
     @iTime += dt
+    @next_grid = @createGrid(@gridCols, @gridRows)
+    @add_sand! if lm.isDown(1)
+    @update_sand!
 
   draw: (dt, iTime)=>
-    lg.draw(@bg, 0, 0)
     lg.print("mouse_x: " .. lm.getX! .. " - mouse_y: " .. lm.getY!, 5, 5)
-    lg.print("Current FPS: " .. tostring(lt.getFPS!), 5, 45)
-    lg.print("Time Elapsed: " .. L.round(@iTime, 0.001), 5, 85)
+    lg.print("Current FPS: " .. tostring(lt.getFPS!), 5, 20)
+
+    -- Draw the grid
+    for x=1, @gridCols
+      for y=1, @gridRows
+        --set color to purple
+        lg.setColor(0.5, 0, 0.5)
+        lg.rectangle("fill", x*@gridSize, y*@gridSize, @gridSize, @gridSize) if @grid[x][y] == 1

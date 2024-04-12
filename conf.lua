@@ -5,8 +5,8 @@ function love.conf(t)
     t.window.title = "YueLOVE"
     t.window.borderless = true
     t.window.resizable = true
-    t.window.width = 1920
-    t.window.height = 1080
+    t.window.width = 640
+    t.window.height = 480
     t.modules.physics = false
     t.modules.joystick = false
 end
