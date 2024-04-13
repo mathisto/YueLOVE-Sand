@@ -10,7 +10,6 @@ export class Game
     @gridRows, @gridCols = @screen_height/@gridSize, @screen_width/@gridSize
     @grid = @createGrid(@gridCols, @gridRows)   -- table which will hold our stars
     @next_grid = {}
-    @dragging = false
 
   createGrid: (cols, rows)=>
     grid = {}
