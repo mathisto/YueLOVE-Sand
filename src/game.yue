@@ -51,13 +51,13 @@ export class Game
     @add_sand! if lm.isDown(1)
     @update_sand!
 
-  draw: (dt, iTime)=>
+  draw: (dt)=>
+    lg.setColor L.color("#ffffff")
     lg.print("mouse_x: " .. lm.getX! .. " - mouse_y: " .. lm.getY!, 5, 5)
     lg.print("Current FPS: " .. tostring(lt.getFPS!), 5, 20)
 
     -- Draw the grid
     for x=1, @gridCols
       for y=1, @gridRows
-        --set color to purple
-        lg.setColor(0.5, 0, 0.5)
+        lg.setColor L.color('#ffff00')
         lg.rectangle("fill", x*@gridSize, y*@gridSize, @gridSize, @gridSize) if @grid[x][y] == 1
